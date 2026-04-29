@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro Mayorista · ANONIMAS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'DM Sans', sans-serif;
+      background: #faf9f7;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 3rem 2rem;
+    }
+
+    .page-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .form-header {
+      border-top: 2px solid #1a1a1a;
+      padding: 1.5rem 0 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .form-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .form-header p {
+      font-size: 11px;
+      color: #999;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .form-intro {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.75;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 0.5px solid #e0ddd8;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #aaa;
+      font-weight: 500;
+      margin: 2rem 0 1rem;
+      padding-bottom: 8px;
+      border-bottom: 0.5px solid #e8e6e2;
+      display: block;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+    .span2 { grid-column: span 2; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #aaa;
+      font-weight: 500;
+    }
+    .field input,
+    .field textarea {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 0.5px solid #d0cdc8;
+      border-radius: 0;
+      padding: 9px 0;
+      color: #1a1a1a;
+      transition: border-color 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: #ccc; font-size: 13px; }
+    .field input:focus,
+    .field textarea:focus {
+      border-bottom: 1.5px solid #1a1a1a;
+    }
+    .field textarea {
+      resize: none;
+      min-height: 56px;
+      line-height: 1.6;
+    }
+    .req { color: #ccc; }
+
+    .tipo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .tipo-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border: 0.5px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: #777;
+      transition: all 0.15s;
+      user-select: none;
+      background: transparent;
+    }
+    .tipo-opt:hover {
+      border-color: #aaa;
+      color: #1a1a1a;
+    }
+    .tipo-opt.selected {
+      border-color: #1a1a1a;
+      color: #1a1a1a;
+      background: #f2f1ef;
+    }
+    .tipo-opt input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      accent-color: #1a1a1a;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .form-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 0.5px solid #e0ddd8;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .form-footer-note {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.7;
+      max-width: 320px;
+    }
+    .btn-submit {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      background: #1a1a1a;
+      color: #faf9f7;
+      border: none;
+      padding: 15px 36px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-submit:hover { opacity: 0.8; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .error-msg {
+      display: none;
+      color: #b94040;
+      font-size: 12px;
+      margin-top: 1rem;
+      padding: 10px 14px;
+      border: 0.5px solid #e8c2c2;
+      border-radius: 4px;
+      background: #fdf5f5;
+    }
+
+    /* Success — oculto por defecto */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 5rem 2rem;
+      border-top: 2px solid #1a1a1a;
+    }
+    .success-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      color: #1a1a1a;
+    }
+    .success-screen p {
+      font-size: 14px;
+      color: #777;
+      line-height: 1.75;
+    }
+    .success-divider {
+      width: 40px;
+      height: 1px;
+      background: #ccc;
+      margin: 1.5rem auto;
+    }
+
+    @media (max-width: 540px) {
+      html, body { padding: 2rem 1.25rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .span2 { grid-column: span 1; }
+      .form-footer { flex-direction: column; align-items: stretch; }
+      .btn-submit { text-align: center; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div id="formSection">
+    <div class="form-header">
+      <h1>Registro mayorista</h1>
+      <p>ANONIMAS · Acceso exclusivo para revendedores</p>
+    </div>
+
+    <p class="form-intro">
+      Completá el formulario con los datos de tu negocio. Una vez recibida tu solicitud, el equipo de ANONIMAS la evaluará y te contactará telefónicamente para continuar el proceso de habilitación.
+    </p>
+
+    <form id="registroForm" action="https://formspree.io/f/mwvyeple" method="POST">
+
+      <span class="section-label">Datos de contacto</span>
+      <div class="form-grid">
+        <div class="field">
+          <label>Nombre y apellido <span class="req">*</span></label>
+          <input type="text" name="nombre" required placeholder="Tu nombre completo">
+        </div>
+        <div class="field">
+          <label>Teléfono <span class="req">*</span></label>
+          <input type="tel" name="telefono" required placeholder="+54 11 0000-0000">
+        </div>
+        <div class="field">
+          <label>E-mail <span class="req">*</span></label>
+          <input type="email" name="email" required placeholder="tu@email.com">
+        </div>
+        <div class="field">
+          <label>CUIT <span class="req">*</span></label>
+          <input type="text" name="cuit" required placeholder="00-00000000-0">
+        </div>
+      </div>
+
+      <span class="section-label">Tipo de negocio <span class="req">*</span></span>
+      <div class="tipo-grid" id="tipoNegocio">
+        <label class="tipo-opt">
+          <input type="checkbox" name="tipo_negocio" value="Local"> Local
+        </label>
+        <label class="tipo-opt">
+          <input type="checkbox" name="tipo_negocio" value="Showroom"> Showroom
+        </label>
+        <label class="tipo-opt">
+          <input type="checkbox" name="tipo_negocio" value="Online"> Online
+        </label>
+        <label class="tipo-opt">
+          <input type="checkbox" name="tipo_negocio" value="Local y Online"> Local + Online
+        </label>
+      </div>
+      <input type="hidden" name="tipo_negocio_resumen" id="tipoHidden">
+
+      <span class="section-label">Ubicación del negocio</span>
+      <div class="form-grid">
+        <div class="field span2">
+          <label>Dirección del local o showroom</label>
+          <input type="text" name="direccion" placeholder="Calle, número, piso/depto">
+        </div>
+        <div class="field">
+          <label>Localidad <span class="req">*</span></label>
+          <input type="text" name="localidad" required placeholder="Ej: Rosario, Córdoba...">
+        </div>
+        <div class="field">
+          <label>Provincia</label>
+          <input type="text" name="provincia" placeholder="Ej: Buenos Aires">
+        </div>
+      </div>
+
+      <span class="section-label">Redes sociales</span>
+      <div class="form-grid">
+        <div class="field">
+          <label>Instagram</label>
+          <input type="text" name="instagram" placeholder="@tu_cuenta">
+        </div>
+        <div class="field">
+          <label>Otras redes</label>
+          <input type="text" name="otras_redes" placeholder="Facebook, TikTok, etc.">
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <p class="form-footer-note">
+          Tu información es confidencial y solo será utilizada para el proceso de habilitación como revendedor de ANONIMAS.
+        </p>
+        <button type="submit" class="btn-submit" id="btnSubmit">Enviar solicitud</button>
+      </div>
+
+      <div class="error-msg" id="errorMsg">
+        Hubo un problema al enviar. Por favor intentá nuevamente o escribinos por WhatsApp.
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Oculto hasta que se envíe -->
+  <div class="success-screen" id="successScreen">
+    <h2>Solicitud enviada</h2>
+    <div class="success-divider"></div>
+    <p>Gracias por tu interés en ser parte de ANONIMAS.<br>Nuestro equipo revisará tu solicitud y se pondrá<br>en contacto telefónico a la brevedad.</p>
+  </div>
+
+</div>
+
+<script>
+  const opts = document.querySelectorAll('.tipo-opt');
+  opts.forEach(opt => {
+    const cb = opt.querySelector('input[type="checkbox"]');
+    cb.addEventListener('change', () => {
+      opt.classList.toggle('selected', cb.checked);
+    });
+  });
+
+  function getTiposSeleccionados() {
+    return [...document.querySelectorAll('input[name="tipo_negocio"]:checked')]
+      .map(i => i.value).join(', ');
+  }
+
+  document.getElementById('registroForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const tipos = getTiposSeleccionados();
+    if (!tipos) {
+      alert('Por favor seleccioná al menos un tipo de negocio.');
+      return;
+    }
+
+    document.getElementById('tipoHidden').value = tipos;
+
+    const btn = document.getElementById('btnSubmit');
+    const errorMsg = document.getElementById('errorMsg');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    errorMsg.style.display = 'none';
+
+    try {
+      const res = await fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this),
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error();
+      }
+    } catch {
+      errorMsg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Enviar solicitud';
+    }
+  });
+</script>
+</body>
+</html>
