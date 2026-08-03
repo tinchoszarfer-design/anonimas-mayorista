@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANONIMAS — Pedido Mayorista</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --accent:#DA4D3A;
+  --accent-dark:#B93E2E;
+  --ink:#161616;
+  --paper:#FFFFFF;
+  --sand:#F6F2ED;
+  --line:#E4DDD3;
+  --muted:#8A8378;
+  --ok:#3D7A4D;
+  --font-display:'Archivo',sans-serif;
+  --font-body:'Work Sans',sans-serif;
+  --radius:2px;
+  --tray-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--tray-h) + 12px);
+}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;letter-spacing:.02em;}
+button{font-family:var(--font-body);cursor:pointer;border:none;background:none;}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+.upper{text-transform:uppercase;letter-spacing:.08em;}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:var(--paper);z-index:40;
+}
+.logo{font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.12em;}
+.logo small{display:block;font-family:var(--font-body);font-weight:500;font-size:10px;letter-spacing:.2em;color:var(--muted);margin-top:1px;}
+.header-actions{display:flex;align-items:center;gap:14px;}
+.icon-btn{position:relative;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;}
+.icon-btn:hover{border-color:var(--ink);}
+.badge{
+  position:absolute;top:-6px;right:-6px;background:var(--accent);color:#fff;
+  font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;
+}
+
+/* ============================================================
+   ACCESS GATE
+   ============================================================ */
+.gate{
+  position:fixed;inset:0;background:var(--ink);z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+.gate[hidden]{display:none;}
+.gate-card{max-width:360px;width:100%;color:#fff;text-align:center;}
+.gate-card .logo{color:#fff;font-size:26px;margin-bottom:6px;}
+.gate-card p{color:#C9C4BB;font-size:14px;line-height:1.5;margin:14px 0 22px;}
+.gate-form{display:flex;flex-direction:column;gap:12px;}
+.gate-form input{
+  background:transparent;border:1px solid #444;color:#fff;padding:14px 16px;
+  font-size:16px;text-align:center;letter-spacing:.15em;border-radius:var(--radius);
+  text-transform:uppercase;
+}
+.gate-form input::placeholder{color:#666;letter-spacing:.05em;}
+.btn-primary{
+  background:var(--accent);color:#fff;padding:14px 20px;font-weight:700;
+  font-size:13px;border-radius:var(--radius);transition:background .15s;
+}
+.btn-primary:hover{background:var(--accent-dark);}
+.gate-error{color:var(--accent);font-size:12px;min-height:16px;}
+.gate-help{margin-top:18px;font-size:12px;color:#666;}
+.gate-help a{color:#999;}
+
+/* ============================================================
+   FILTER BAR
+   ============================================================ */
+.filter-bar{
+  padding:16px 24px;border-bottom:1px solid var(--line);
+  display:flex;flex-direction:column;gap:12px;background:var(--paper);
+  position:sticky;top:75px;z-index:30;
+}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.tab{
+  padding:8px 14px;border:1px solid var(--line);border-radius:20px;
+  font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;
+}
+.tab.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+.filter-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.select-wrap{position:relative;}
+.select-wrap select{
+  appearance:none;border:1px solid var(--line);padding:8px 30px 8px 12px;
+  font-size:12px;border-radius:var(--radius);background:var(--paper);color:var(--ink);
+  text-transform:uppercase;letter-spacing:.04em;font-weight:600;
+}
+.select-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;pointer-events:none;color:var(--muted);}
+.search-wrap{flex:1;min-width:140px;position:relative;}
+.search-wrap input{
+  width:100%;border:1px solid var(--line);padding:8px 12px;font-size:13px;
+  border-radius:var(--radius);
+}
+.result-count{font-size:11px;color:var(--muted);letter-spacing:.04em;}
+
+/* ============================================================
+   GRID
+   ============================================================ */
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:1px;background:var(--line);border-top:1px solid var(--line);
+}
+.card{background:var(--paper);padding:0;display:flex;flex-direction:column;text-align:left;position:relative;}
+.card-img{
+  aspect-ratio:3/4;background:var(--sand);position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.card-img .mono{font-family:var(--font-display);font-weight:800;font-size:13px;letter-spacing:.1em;color:var(--line);text-align:center;padding:10px;text-transform:uppercase;}
+.card-img .mono span{display:block;font-size:9px;color:var(--muted);font-weight:600;margin-top:6px;letter-spacing:.15em;}
+.tag-collection{
+  position:absolute;top:8px;left:8px;background:var(--paper);padding:3px 7px;
+  font-size:9px;font-weight:700;letter-spacing:.08em;border-radius:2px;color:var(--ink);
+}
+.tag-nostock{
+  position:absolute;top:8px;right:8px;background:var(--ink);color:#fff;padding:3px 7px;
+  font-size:9px;font-weight:700;letter-spacing:.05em;border-radius:2px;
+}
+.card-body{padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;}
+.card-cat{font-size:9px;color:var(--muted);letter-spacing:.1em;font-weight:600;}
+.card-name{font-family:var(--font-display);font-size:13px;font-weight:700;line-height:1.25;}
+.card-price{font-size:13px;font-weight:600;margin-top:auto;padding-top:6px;}
+.card-price.consult{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.empty-state{padding:80px 24px;text-align:center;color:var(--muted);}
+.empty-state h3{color:var(--ink);margin-bottom:6px;font-size:15px;}
+
+/* ============================================================
+   MODAL — product detail
+   ============================================================ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(22,22,22,.55);z-index:150;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.modal-overlay[hidden]{display:none;}
+.modal{
+  background:var(--paper);width:100%;max-width:520px;max-height:92vh;overflow-y:auto;
+  border-radius:14px 14px 0 0;position:relative;
+}
+@media(min-width:640px){
+  .modal-overlay{align-items:center;}
+  .modal{border-radius:8px;max-height:88vh;}
+}
+.modal-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;
+  background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:16px;z-index:5;
+}
+.modal-img{aspect-ratio:4/5;background:var(--sand);display:flex;align-items:center;justify-content:center;}
+.modal-img .mono{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:.1em;color:var(--line);text-align:center;text-transform:uppercase;}
+.modal-img .mono span{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:8px;letter-spacing:.15em;}
+.modal-body{padding:22px 22px 28px;}
+.modal-cat{font-size:10px;color:var(--muted);letter-spacing:.12em;font-weight:700;}
+.modal-name{font-size:20px;margin:4px 0 8px;}
+.modal-price{font-size:19px;font-weight:700;color:var(--ink);}
+.modal-price.consult{color:var(--accent);font-size:14px;text-transform:uppercase;letter-spacing:.04em;}
+.modal-price-menor{font-size:12px;color:var(--muted);margin-top:2px;}
+.modal-desc{font-size:13px;line-height:1.55;color:#4a453d;margin:14px 0;}
+.field-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:16px 0 8px;color:var(--ink);}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;}
+.swatch{
+  padding:8px 13px;border:1px solid var(--line);border-radius:20px;font-size:12px;font-weight:600;
+  letter-spacing:.03em;text-transform:uppercase;
+}
+.swatch.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+.swatch:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed;}
+.stock-hint{font-size:11px;margin-top:8px;font-weight:600;}
+.stock-hint.low{color:var(--accent);}
+.stock-hint.out{color:var(--muted);}
+.qty-row{display:flex;align-items:center;gap:14px;margin-top:18px;}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius);}
+.stepper button{width:38px;height:40px;font-size:16px;font-weight:600;}
+.stepper span{width:36px;text-align:center;font-weight:700;font-size:14px;}
+.modal-add{
+  width:100%;margin-top:20px;background:var(--accent);color:#fff;padding:15px;
+  font-weight:700;font-size:13px;letter-spacing:.05em;border-radius:var(--radius);
+  text-transform:uppercase;transition:background .15s;
+}
+.modal-add:hover{background:var(--accent-dark);}
+.modal-add:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;}
+.talle-guide-link{display:inline-block;margin-top:10px;font-size:11px;color:var(--muted);text-decoration:underline;}
+
+/* ============================================================
+   ORDER TRAY (signature element — order docket)
+   ============================================================ */
+.tray-bar{
+  position:fixed;left:0;right:0;bottom:0;height:var(--tray-h);background:var(--ink);color:#fff;
+  z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  transition:transform .2s;
+}
+.tray-bar[hidden]{transform:translateY(100%);display:flex;}
+.tray-bar-info{display:flex;flex-direction:column;}
+.tray-bar-info b{font-size:13px;letter-spacing:.03em;}
+.tray-bar-info span{font-size:10px;color:#9c968b;letter-spacing:.05em;}
+.tray-open-btn{background:var(--accent);color:#fff;padding:10px 18px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+
+.tray-panel{
+  position:fixed;inset:0;z-index:180;background:rgba(22,22,22,.55);display:flex;
+  align-items:flex-end;justify-content:center;
+}
+.tray-panel[hidden]{display:none;}
+.tray-sheet{
+  background:var(--paper);width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;
+  border-radius:14px 14px 0 0;
+}
+@media(min-width:640px){.tray-panel{align-items:center;} .tray-sheet{border-radius:8px;max-height:85vh;}}
+.tray-header{
+  padding:20px 22px 14px;border-bottom:1px dashed var(--line);display:flex;
+  align-items:center;justify-content:space-between;
+}
+.tray-header h2{font-size:16px;}
+.tray-items{flex:1;overflow-y:auto;padding:6px 22px;}
+.tray-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);}
+.tray-item-thumb{
+  width:48px;height:60px;background:var(--sand);border-radius:2px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);
+  font-weight:800;font-size:9px;color:var(--line);text-align:center;
+}
+.tray-item-info{flex:1;min-width:0;}
+.tray-item-info b{font-size:12.5px;display:block;}
+.tray-item-info span{font-size:11px;color:var(--muted);display:block;margin-top:1px;}
+.tray-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.tray-item-price{font-size:12px;font-weight:700;}
+.tray-item-actions{display:flex;align-items:center;gap:6px;}
+.tray-item-actions button{width:24px;height:24px;border:1px solid var(--line);border-radius:4px;font-size:13px;}
+.tray-item-remove{font-size:10px;color:var(--muted);text-decoration:underline;margin-top:2px;}
+.tray-empty{padding:60px 24px;text-align:center;color:var(--muted);font-size:13px;}
+.tray-footer{padding:16px 22px 22px;border-top:1px solid var(--line);}
+.client-field{width:100%;border:1px solid var(--line);padding:11px 13px;font-size:13px;border-radius:var(--radius);margin-bottom:14px;}
+.tray-total-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:var(--muted);}
+.tray-total-row.main{color:var(--ink);font-weight:700;font-size:15px;margin-bottom:14px;}
+.btn-whatsapp{
+  width:100%;background:#25D366;color:#fff;padding:15px;border-radius:var(--radius);
+  font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-whatsapp:disabled{background:var(--line);color:var(--muted);}
+.tray-clear{display:block;margin:12px auto 0;font-size:11px;color:var(--muted);text-decoration:underline;}
+
+/* toast */
+.toast{
+  position:fixed;bottom:calc(var(--tray-h) + 16px);left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:11px 20px;border-radius:30px;font-size:12.5px;font-weight:600;
+  z-index:250;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{padding:40px 24px 30px;text-align:center;color:var(--muted);font-size:11px;letter-spacing:.03em;}
+</style>
+</head>
+<body>
+
+<!-- ACCESS GATE -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="logo">ANONIMAS<small>VENTA MAYORISTA</small></div>
+    <p>Ingresá el código de acceso mayorista para ver precios y armar tu pedido.</p>
+    <form class="gate-form" id="gateForm">
+      <input type="text" id="gateInput" placeholder="CÓDIGO DE ACCESO" autocomplete="off">
+      <button type="submit" class="btn-primary upper">Ingresar</button>
+      <div class="gate-error" id="gateError"></div>
+    </form>
+    <div class="gate-help">¿No tenés código? <a href="https://mayoristas.anonimasargentina.com/registro-mayorista/" target="_blank">Registrate acá</a></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">ANONIMAS<small>PEDIDO MAYORISTA</small></div>
+  <div class="header-actions">
+    <button class="icon-btn" id="openTrayBtn" aria-label="Ver mi pedido">
+      🧾<span class="badge" id="trayBadge" hidden>0</span>
+    </button>
+  </div>
+</header>
+
+<!-- FILTERS -->
+<div class="filter-bar">
+  <div class="tabs" id="collectionTabs"></div>
+  <div class="filter-row">
+    <div class="select-wrap">
+      <select id="categoryFilter"><option value="">Categoría</option></select>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Buscar producto...">
+    </div>
+  </div>
+  <div class="result-count" id="resultCount"></div>
+</div>
+
+<!-- GRID -->
+<main class="grid" id="grid"></main>
+
+<footer>ANONIMAS · Venta Mayorista · Este pedido se coordina por WhatsApp, no es una compra online.</footer>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal" hidden>
+  <div class="modal">
+    <button class="modal-close" id="closeModal" aria-label="Cerrar">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ORDER TRAY BAR -->
+<div class="tray-bar" id="trayBar" hidden>
+  <div class="tray-bar-info">
+    <b id="trayBarCount">0 productos</b>
+    <span id="trayBarTotal">Total estimado $0</span>
+  </div>
+  <button class="tray-open-btn upper" id="trayOpenBtn2">Ver pedido</button>
+</div>
+
+<!-- ORDER TRAY PANEL -->
+<div class="tray-panel" id="trayPanel" hidden>
+  <div class="tray-sheet">
+    <div class="tray-header">
+      <h2>Mi pedido</h2>
+      <button class="modal-close" id="closeTray" aria-label="Cerrar" style="position:static;">✕</button>
+    </div>
+    <div class="tray-items" id="trayItems"></div>
+    <div class="tray-footer" id="trayFooter"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const PRODUCTS = [{"id":"pantalon-kim","name":"PANTALON KIM","collection":"INVIERNO 26","category":"PANTALONES","description":"Elegante y cómodo, este pantalón confeccionado en saten sastrero con terminaciones perfectas es una prenda ideal para armar un super traje con el BLAZER KIM. Si lo querés usar solo también es un aliado clave.","priceMayor":180000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":3},{"color":"NEGRO","talle":"T2","stock":1},{"color":"NEGRO","talle":"T3","stock":1},{"color":"GRIS PLATA","talle":"T1","stock":1},{"color":"GRIS PLATA","talle":"T2","stock":1},{"color":"GRIS PLATA","talle":"T3","stock":1}],"stockSource":"csv_2026-07"},{"id":"pantalon-tafeta","name":"PANTALON TAFETA","collection":"INVIERNO 26","category":"SETS","description":"Hola, soy el pantalón perfecto. De tafeta elastizada para usar de dia con zapas y de noche para salir a romperla. Querés más, combinalo con la CAMPERA TAFETA","priceMayor":145000,"priceMenor":null,"image":null,"variants":[{"color":"GRIS PLATA","talle":"T1","stock":0},{"color":"GRIS PLATA","talle":"T2","stock":1},{"color":"GRIS PLATA","talle":"T3","stock":3},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T3","stock":0}],"stockSource":"csv_2026-07"},{"id":"pantalon-water","name":"PANTALON WATER","collection":"INVIERNO 26","category":"SETS","description":"Si querías un pantalón cómodo y canchero, no busques más. Aca lo encontraste. Confeccionado en una gabardina con acabado agamuzada este pantalón es perfecto. Y si lo combinas con la CAMPERA WATER salis campeona","priceMayor":130000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":0},{"color":"CRUDO","talle":"T2","stock":1},{"color":"CRUDO","talle":"T3","stock":1},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T3","stock":2}],"stockSource":"csv_2026-07"},{"id":"pantalon-field","name":"PANTALON FIELD","collection":"INVIERNO 26","category":"SETS","description":"Confeccionado en una gabardina satinada, este pantalón es de los preferidos de nuestras clientas. Mirá bien el detalle que tiene en la botamanga con una presilla que te permite hacerlo mas baggie o dejarlo como recto.","priceMayor":190000,"priceMenor":null,"image":null,"variants":[{"color":"VERDE","talle":"T1","stock":2},{"color":"VERDE","talle":"T1","stock":5},{"color":"VERDE","talle":"T1","stock":5},{"color":"VERDE","talle":"T1","stock":5},{"color":"VERDE","talle":"T2","stock":2},{"color":"VERDE","talle":"T2","stock":5},{"color":"VERDE","talle":"T2","stock":5},{"color":"VERDE","talle":"T2","stock":5},{"color":"VERDE","talle":"T3","stock":2},{"color":"VERDE","talle":"T3","stock":5},{"color":"VERDE","talle":"T3","stock":5},{"color":"VERDE","talle":"T3","stock":5},{"color":"NEGRO","talle":"T1","stock":2},{"color":"NEGRO","talle":"T2","stock":2},{"color":"NEGRO","talle":"T3","stock":2}],"stockSource":"csv_2026-07"},{"id":"pantalon-recortes","name":"PANTALON RECORTES","collection":"INVIERNO 26","category":"PANTALONES","description":"Jean estilo baggie con recortes a contratono y un lavado vintage. Prenda que no te puede faltar en tu guardarropas.","priceMayor":130000,"priceMenor":null,"image":null,"variants":[{"color":"DENIM BLACK","talle":"T1","stock":0},{"color":"DENIM BLACK","talle":"T2","stock":0},{"color":"DENIM BLACK","talle":"T3","stock":1},{"color":"DENIM BLUE","talle":"T1","stock":0},{"color":"DENIM BLUE","talle":"T2","stock":1},{"color":"DENIM BLUE","talle":"T3","stock":2}],"stockSource":"csv_2026-07"},{"id":"pantalon-kimkong","name":"PANTALON KIMKONG","collection":"INVIERNO 26","category":"SETS","description":"Pantalón estilo barrel confeccionado en saten sastrero con recortes super cancheros y favorecedores. Amplio, cómodo y muy moderno. Combinado con el BLAZER KIM es un traje único.","priceMayor":192000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":1},{"color":"NEGRO","talle":"T2","stock":1},{"color":"NEGRO","talle":"T3","stock":1},{"color":"GRIS PLATA","talle":"T1","stock":1},{"color":"GRIS PLATA","talle":"T2","stock":1},{"color":"GRIS PLATA","talle":"T3","stock":1}],"stockSource":"csv_2026-07"},{"id":"palazzo-saten","name":"PALAZZO SATEN","collection":"INVIERNO 26","category":"SETS","description":"Palazzo confeccionado en saten para usar siempre. Completá el look con la BLUSA SATEN. Yo te avise.","priceMayor":165000,"priceMenor":null,"image":null,"variants":[{"color":"BEIGE","talle":"T1","stock":5},{"color":"BEIGE","talle":"T2","stock":5},{"color":"BEIGE","talle":"T3","stock":5},{"color":"NEGRO","talle":"T1","stock":5},{"color":"NEGRO","talle":"T2","stock":5},{"color":"NEGRO","talle":"T3","stock":5}],"stockSource":"csv_2026-07"},{"id":"blazer-kim","name":"BLAZER KIM","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Aca el blazer perfecto. Confeccionado en saten sastrero. Un corte cómodo y canchero. Combinalo con el PANTALON KIMKONG para una versión de traje más relajado o con el PANTALON KIM para un look más clásico.","priceMayor":340000,"priceMenor":null,"image":null,"variants":[{"color":"GRIS PLATA","talle":"T1","stock":3},{"color":"GRIS PLATA","talle":"T2","stock":3},{"color":"GRIS PLATA","talle":"T3","stock":1},{"color":"NEGRO","talle":"T1","stock":3},{"color":"NEGRO","talle":"T2","stock":3},{"color":"NEGRO","talle":"T3","stock":1}],"stockSource":"csv_2026-07"},{"id":"campera-tafeta","name":"CAMPERA TAFETA","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Chaqueta de tafeta elastizada, cierre doble camino, cierres en laterales del cuerpo y un calce perfecto para esta prenda que vas a amar y vas a usar todo el año, todos los años. Combinada con el PANTALON TAFETA ya es afano.","priceMayor":160000,"priceMenor":null,"image":null,"variants":[{"color":"GRIS PLATA","talle":"T1","stock":0},{"color":"GRIS PLATA","talle":"T2","stock":0},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0}],"stockSource":"csv_2026-07"},{"id":"campera-field","name":"CAMPERA FIELD","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Chaqueta corta confeccionada en gabardina satinada con detalles de botones en delantero. Canchera por demás. Si tenes ganas de armar un look todavia más perfecto combinada con el PANTALON FIELD","priceMayor":190000,"priceMenor":null,"image":null,"variants":[{"color":"VERDE","talle":"T1","stock":2},{"color":"VERDE","talle":"T1","stock":2},{"color":"VERDE","talle":"T1","stock":2},{"color":"VERDE","talle":"T1","stock":2},{"color":"VERDE","talle":"T2","stock":0},{"color":"VERDE","talle":"T2","stock":0},{"color":"VERDE","talle":"T2","stock":0},{"color":"VERDE","talle":"T2","stock":0},{"color":"VERDE","talle":"T3","stock":0},{"color":"VERDE","talle":"T3","stock":1},{"color":"VERDE","talle":"T3","stock":1},{"color":"VERDE","talle":"T3","stock":1},{"color":"NEGRO","talle":"T1","stock":2},{"color":"NEGRO","talle":"T2","stock":1},{"color":"NEGRO","talle":"T3","stock":0}],"stockSource":"csv_2026-07"},{"id":"campera-water","name":"CAMPERA WATER","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Camperita corta, balloon y con una textura agamuzada que la hace perfecta. Combinada con el PANTALÓN WATER es un conjunto genial","priceMayor":160000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":0},{"color":"CRUDO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T1","stock":1},{"color":"NEGRO","talle":"T2","stock":1}],"stockSource":"csv_2026-07"},{"id":"blusa-saten","name":"BLUSA SATEN","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Blusa oversize con escote de camisa que es un hit para lograr un look básico y elegante. Con el Palazzo Saten hace una dupla invencible.","priceMayor":155000,"priceMenor":null,"image":null,"variants":[{"color":"BEIGE","talle":"T1","stock":4},{"color":"BEIGE","talle":"T2","stock":4},{"color":"NEGRO","talle":"T1","stock":4},{"color":"NEGRO","talle":"T2","stock":4}],"stockSource":"csv_2026-07"},{"id":"blusa-crepe","name":"BLUSA CREPE","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Combinada en saten y gasa esta blusa es perfecta. De las preferidas de nuestras clientas.","priceMayor":120000,"priceMenor":null,"image":null,"variants":[{"color":"ROJO","talle":"T1","stock":1},{"color":"ROJO","talle":"T2","stock":1},{"color":"NEGRO","talle":"T1","stock":1},{"color":"NEGRO","talle":"T2","stock":2}],"stockSource":"csv_2026-07"},{"id":"blusa-sharpei","name":"BLUSA SHARPEI","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Si queres darle onda a una remera básica escote en V, aca tenes esta blusa de rayón texturizado que convierte una prenda básica en algo diferente.","priceMayor":110000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":2},{"color":"CRUDO","talle":"T2","stock":2},{"color":"NEGRO","talle":"T1","stock":2},{"color":"NEGRO","talle":"T2","stock":2}],"stockSource":"csv_2026-07"},{"id":"remera-femme","name":"REMERA FEMME","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"","priceMayor":60000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0},{"color":"BLANCA","talle":"T1","stock":0},{"color":"BLANCA","talle":"T2","stock":0}],"stockSource":"csv_2026-07"},{"id":"remera-merlina","name":"REMERA MERLINA","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"","priceMayor":75000,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"TU","stock":0},{"color":"NEGRO","talle":"TU","stock":0}],"stockSource":"csv_2026-07"},{"id":"camisa-amara","name":"CAMISA AMARA","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"La camisa de las plumitas. Esta es una camisa básica confeccionada con una tela única con relieves tipo plumas que la hacen una prenda diferente.","priceMayor":165000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":3},{"color":"NEGRO","talle":"TU","stock":3}],"stockSource":"csv_2026-07"},{"id":"pantalon-diagonal","name":"PANTALON DIAGONAL","collection":"INVIERNO 26","category":"PANTALONES","description":"Jean mega amplio con doble botón y cierre en diagonal. Un clasico de siempre reversionado en esta prenda super canchera.","priceMayor":140000,"priceMenor":null,"image":null,"variants":[{"color":"DENIM BLACK","talle":"T1","stock":0},{"color":"DENIM BLACK","talle":"T2","stock":0},{"color":"DENIM BLACK","talle":"T3","stock":3},{"color":"DENIM BLACK","talle":"T4","stock":2},{"color":"DENIM BLUE","talle":"T1","stock":0},{"color":"DENIM BLUE","talle":"T2","stock":1},{"color":"DENIM BLUE","talle":"T3","stock":2},{"color":"DENIM BLUE","talle":"T4","stock":2}],"stockSource":"csv_2026-07"},{"id":"pantalon-nobuk","name":"PANTALON NOBUK","collection":"INVIERNO 26","category":"PANTALONES","description":"Una moldería perfecta en una nueva versión de textura tipo nobuk. Canchero y diferente. Combinalo con el CHALECO NOBUK","priceMayor":180000,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":0},{"color":"CHOCOLATE","talle":"T2","stock":0},{"color":"CHOCOLATE","talle":"T3","stock":0},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T3","stock":0}],"stockSource":"csv_2026-07"},{"id":"pantalon-cotton-saten","name":"PANTALON COTTON SATEN","collection":"INVIERNO 26","category":"PANTALONES","description":"Cómodo, básico y apto para toda ocasión. Confeccionado en cotton saten elastizado y con un corte perfecto.","priceMayor":110000,"priceMenor":null,"image":null,"variants":[{"color":"BORDEAUX","talle":"T1","stock":4},{"color":"BORDEAUX","talle":"T2","stock":4},{"color":"BORDEAUX","talle":"T3","stock":4},{"color":"CRUDO","talle":"T1","stock":4},{"color":"CRUDO","talle":"T2","stock":4},{"color":"CRUDO","talle":"T3","stock":4}],"stockSource":"csv_2026-07"},{"id":"pantalon-bull","name":"PANTALON BULL","collection":"INVIERNO 26","category":"SETS","description":"Este pantalón casi se agota antes del lanzamiento. Confeccionado en gabardina tipo jean con pinzas en delantero y estilo baggie es perfecto. Con la CAMPERA BULL son un equipazo.","priceMayor":130000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":0},{"color":"CRUDO","talle":"T2","stock":0},{"color":"CRUDO","talle":"T3","stock":1},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T3","stock":1}],"stockSource":"csv_2026-07"},{"id":"saco-zip","name":"SACO ZIP","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Aca les presento mi prenda preferida de la colección. Una campera/saco confeccionda en neoprene con polar en su interior que se pasa de canchera. Detalle de cierres en mangas y unas solapas que está despegadas hacen de esta prenda una verdadera maravilla. Abrigate con onda este invierno, haceme caso.","priceMayor":280000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":2},{"color":"NEGRO","talle":"T2","stock":2}],"stockSource":"csv_2026-07"},{"id":"campera-bull","name":"CAMPERA BULL","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Chaqueta corta confeccionada en gabardina tipo jean, corte perfecto. Para usar con el PANTALÓN BULL o sola. Es de las prendas que consideramos INDISPENSABLES","priceMayor":162000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":1},{"color":"NEGRO","talle":"TU","stock":1}],"stockSource":"csv_2026-07"},{"id":"campera-polar-crack","name":"CAMPERA POLAR CRACK","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Es una prenda única que cada temporada nos sale mejor. Confeccionada sobre un polar delgado que se manda a estampar con foil y despues de un proceso de ruptura manual (una por una) nos da como resultado esta prenda perfecta. Además esta temporada el upgrade del cierre doble camino que le da una terminación genial","priceMayor":158000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":2},{"color":"NEGRO","talle":"T2","stock":0}],"stockSource":"csv_2026-07"},{"id":"campera-neo","name":"CAMPERA NEO","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Campera de tejido tipo neoprene combinada con Bengalina elastizada, corte irregular y cancherisimo","priceMayor":185000,"priceMenor":null,"image":null,"variants":[{"color":"BEIGE","talle":"T1","stock":0},{"color":"BEIGE","talle":"T2","stock":0},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0}],"stockSource":"csv_2026-07"},{"id":"chaleco-nobuk","name":"CHALECO NOBUK","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Una nueva versión del chaleco sastrero que siempre queres tener. Esta vez en una textura tipo nobuk y un corte perfecto. Con el PANTALON NOBUK conforman una pareja ideal.","priceMayor":140000,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":0},{"color":"CHOCOLATE","talle":"T2","stock":0},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":0}],"stockSource":"csv_2026-07"},{"id":"campera-water-long","name":"CAMPERA WATER LONG","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Campera estilo balloon extra larga con broches cancherisimos en delantero. Perfecta","priceMayor":220000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":1},{"color":"NEGRO","talle":"TU","stock":1}],"stockSource":"csv_2026-07"},{"id":"campera-cuero","name":"CAMPERA CUERO","collection":"INVIERNO 26","category":"CAMPERAS Y ABRIGOS","description":"Campera overize balloon confeccionada en cuero sintético con detalle de broches en delantero.","priceMayor":240000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":2}],"stockSource":"csv_2026-07"},{"id":"blusa-shadow","name":"BLUSA SHADOW","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Blusa escote V confeccionada en gasa doble con textura y unos recortes cancherisimos al corte en la sisa.","priceMayor":130000,"priceMenor":null,"image":null,"variants":[{"color":"CEMENTO","talle":"TU","stock":2},{"color":"NEGRO","talle":"TU","stock":2}],"stockSource":"csv_2026-07"},{"id":"blusa-greta","name":"BLUSA GRETA","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Blusa oversize de saten estampado con escote de camisa que es un hit para lograr un look básico y elegante.","priceMayor":175000,"priceMenor":null,"image":null,"variants":[{"color":"CEMENTO","talle":"T1","stock":4},{"color":"CEMENTO","talle":"T2","stock":4}],"stockSource":"csv_2026-07"},{"id":"camisa-shadow","name":"CAMISA SHADOW","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Camisa amplia confeccionada en gasa doble con textura que hace la hace una prenda diferente. Apta para todo tipo de cuerpos es una aliada para tus looks.","priceMayor":160000,"priceMenor":null,"image":null,"variants":[{"color":"CEMENTO","talle":"TU","stock":3},{"color":"NEGRO","talle":"TU","stock":3}],"stockSource":"csv_2026-07"},{"id":"camisa-reina","name":"CAMISA REINA","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Camisa confeccionada en saten con detalle en las mangas tipo balloon. Una nueva verion para una camisa basica.","priceMayor":140000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":0},{"color":"ROJO","talle":"TU","stock":2}],"stockSource":"csv_2026-07"},{"id":"camisa-lazo","name":"CAMISA LAZO","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Camisa confeccionado en saten rayado con gasa. Una prenda única con su corbatín para que puedas armar el look que prefieras. Con jean o con traje, vos elegis que estilo darle.","priceMayor":150000,"priceMenor":null,"image":null,"variants":[{"color":"NUDE","talle":"T1","stock":2},{"color":"NUDE","talle":"T2","stock":2},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":1}],"stockSource":"csv_2026-07"},{"id":"camisa-volado","name":"CAMISA VOLADO","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Romántica y canchera. Para usar casual o en un plan más elegante. Camisa de gasa con volados, uno de los hits de esta temporada","priceMayor":165000,"priceMenor":null,"image":null,"variants":[{"color":"CEMENTO","talle":"TU","stock":2},{"color":"NEGRO","talle":"TU","stock":2}],"stockSource":"csv_2026-07"},{"id":"camisa-femme","name":"CAMISA FEMME","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Camisa confeccionada en un punto con textura que es increible. Y como para completar esta prenda que es de nuestras preferidas, se prende en el delatero con una tira de ganchos corseteros que la hacen aun más única.","priceMayor":110000,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"T1","stock":0},{"color":"BLANCO","talle":"T2","stock":0}],"stockSource":"csv_2026-07"},{"id":"remera-mix","name":"REMERA MIX","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Remera confeccionada en morley de punto super pesado con detalle de recortes y costuras a contratono.","priceMayor":60000,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"TU","stock":0},{"color":"NEGRO","talle":"TU","stock":1}],"stockSource":"csv_2026-07"},{"id":"remera-gota","name":"REMERA GOTA","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"En microfibra de punto, esta remera con mangas abuchonadas y escote gota se convierte en una aliada para las salidas. Tiene el detalle de boton de strass en el cierre del escote. Es genial.","priceMayor":65000,"priceMenor":null,"image":null,"variants":[{"color":"BEIGE","talle":"TU","stock":3},{"color":"NEGRO","talle":"TU","stock":3}],"stockSource":"csv_2026-07"},{"id":"remera-plain","name":"REMERA PLAIN","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Remeron confeccionado en Modal de punto combinado con Rayón. Es una remera / blusa. Muy canchera y ultra cómoda.","priceMayor":85000,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"TU","stock":2}],"stockSource":"csv_2026-07"},{"id":"remera-v-w26","name":"REMERA V W26","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Remera escote en V confeccionada en modal de punto. Basica con un toque diferente en el cuello con el vivo al corte. 100% apta para todos los looks","priceMayor":60000,"priceMenor":null,"image":null,"variants":[{"color":"GRIS MELANGE","talle":"T1","stock":1},{"color":"GRIS MELANGE","talle":"T2","stock":0},{"color":"BLANCO","talle":"T1","stock":1},{"color":"BLANCO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T1","stock":0},{"color":"NEGRO","talle":"T2","stock":1}],"stockSource":"csv_2026-07"},{"id":"remeron-angelina-6amur","name":"REMERON ANGELINA","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Remeron de lanilla muy canchero con recortes en forma de V delantero y espalda. Un clasico de Anonimas en una nueva version para este invierno.","priceMayor":85000,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":2},{"color":"GRIS MELANGE","talle":"TU","stock":2}],"stockSource":"csv_2026-07"},{"id":"sweater-boton-kai-1pai7","name":"SWEATER BOTON KAI","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Sweater canchero, versatil y difeterente. Tejido ultra liviano y con textura suave con botones diferentes para usarlos en delantero y espalda. Una prenda y dos formas de usarla.","priceMayor":136000,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":1},{"color":"NEGRO","talle":"TU","stock":0},{"color":"GRIS MELANGE","talle":"TU","stock":1}],"stockSource":"csv_2026-07"},{"id":"remera-jill-b952a","name":"REMERA JILL","collection":"INVIERNO 26","category":"BLUSAS Y CAMISAS","description":"Remera basica escote redondo confeccionada en morley de punto con detalle de vivo en tul elastizado en cuello y puños. Basica con actitud.","priceMayor":65000,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"T1","stock":0},{"color":"BLANCO","talle":"T2","stock":0},{"color":"NEGRO","talle":"T1","stock":1},{"color":"NEGRO","talle":"T2","stock":1}],"stockSource":"csv_2026-07"},{"id":"blusa-janga","name":"BLUSA JANGA","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"BLUSA ENCAJE","priceMayor":58695,"priceMenor":135000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":58695,"priceMenor":135000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":58695,"priceMenor":135000}],"stockSource":null},{"id":"blusa-jaz","name":"BLUSA JAZ","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"BLUSA LAZO","priceMayor":71739,"priceMenor":165000,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":71739,"priceMenor":165000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":71739,"priceMenor":165000},{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":71739,"priceMenor":165000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":71739,"priceMenor":165000}],"stockSource":null},{"id":"blusa-puka","name":"BLUSA PUKA","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"BLUSA LINO C MANGAS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"VISON","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"blusa-con-faldon","name":"BLUSA CON FALDON","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"BEIGE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"blusa-paros","name":"BLUSA PAROS","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"TOP PAPER","priceMayor":41304,"priceMenor":95000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"VISON","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000}],"stockSource":null},{"id":"blusa-paradise","name":"BLUSA PARADISE","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"BLUSA PORTOFINO","priceMayor":41304,"priceMenor":95000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"VERDE","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"BEIGE","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000}],"stockSource":null},{"id":"camisa-juquehy","name":"CAMISA JUQUEHY","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA CLASICA","priceMayor":50000,"priceMenor":115000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":50000,"priceMenor":115000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":50000,"priceMenor":115000},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":50000,"priceMenor":115000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":50000,"priceMenor":115000}],"stockSource":null},{"id":"camisa-joaquina","name":"CAMISA JOAQUINA","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA MURCIELAGO","priceMayor":63043,"priceMenor":145000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":63043,"priceMenor":145000}],"stockSource":null},{"id":"camisa-loberia","name":"CAMISA LOBERIA","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA POPLIN","priceMayor":65217,"priceMenor":150000,"image":null,"variants":[{"color":"ROSA","talle":"TU","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"AMARILLO","talle":"TU","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"CELESTE","talle":"TU","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"BLANCO","talle":"TU","stock":null,"priceMayor":65217,"priceMenor":150000}],"stockSource":null},{"id":"camisa-waikiki","name":"CAMISA WAIKIKI","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA AMERICANA","priceMayor":42609,"priceMenor":98000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":42609,"priceMenor":98000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":42609,"priceMenor":98000}],"stockSource":null},{"id":"camisa-ceci-28407","name":"CAMISA CECI - 28407","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA MANGAS BALOON","priceMayor":65217,"priceMenor":150000,"image":null,"variants":[{"color":"CURRY","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"CURRY","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"BLANCO","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"BLANCO","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"NUDE","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"NUDE","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000}],"stockSource":null},{"id":"camisa-lisboa","name":"CAMISA LISBOA","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA ZIG ZAG","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"camisa-ibiza","name":"CAMISA IBIZA","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"TUNICA ESTAMPADA","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"ESTAMPA NEGRA","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ESTAMPA BEIGE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"camisa-natal","name":"CAMISA NATAL","collection":"VERANO 2027","category":"BLUSAS Y CAMISAS","description":"CAMISA MANGA ANCHA","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ROJO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"campera-piton","name":"CAMPERA PITON","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CAMPERA PITON","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"GRIS PITON","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"camperita-baloon-escote-v","name":"CAMPERITA BALOON ESCOTE V","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"","priceMayor":69565,"priceMenor":160000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":69565,"priceMenor":160000},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":69565,"priceMenor":160000}],"stockSource":null},{"id":"chaqueta-pelicanos","name":"CHAQUETA PELICANOS","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CAMPERA GABARDINA MANGAS BALLOON","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"VISON","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"chaleco-formentera","name":"CHALECO FORMENTERA","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CHALECO SASTRERO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"chaleco-ibiza","name":"CHALECO IBIZA","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CHALECO PRINTED","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"ESTAMPA NEGRA","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"campera-ipanema","name":"CAMPERA IPANEMA","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CAMPERA SILK","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"GRIS GRAFITO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"kimono-ischia","name":"KIMONO ISCHIA","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CONTRAST KIMONO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"kimono-milos","name":"KIMONO MILOS","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"KIMONO CON ENTREDOS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"chaleco-noosa","name":"CHALECO NOOSA","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CHALECO LINO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"chaleco-antunes","name":"CHALECO ANTUNES","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CHALECO WATER","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"chaleco-alicante","name":"CHALECO ALICANTE","collection":"VERANO 2027","category":"CAMPERAS Y ABRIGOS","description":"CHALECO BULL","priceMayor":41304,"priceMenor":95000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000}],"stockSource":null},{"id":"pantalon-antunes","name":"PANTALON ANTUNES","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON KIMKONG WATER","priceMayor":57391,"priceMenor":132000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":57391,"priceMenor":132000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":57391,"priceMenor":132000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":57391,"priceMenor":132000},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":57391,"priceMenor":132000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":57391,"priceMenor":132000},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":57391,"priceMenor":132000}],"stockSource":null},{"id":"pantalon-alicante","name":"PANTALON ALICANTE","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON BULL","priceMayor":65217,"priceMenor":150000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"VERDE","talle":"T1","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":65217,"priceMenor":150000},{"color":"VERDE","talle":"T3","stock":null,"priceMayor":65217,"priceMenor":150000}],"stockSource":null},{"id":"pantalon-piton","name":"PANTALON PITON","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON PITON","priceMayor":74782,"priceMenor":172000,"image":null,"variants":[{"color":"GRIS PITON","talle":"T1","stock":null,"priceMayor":74782,"priceMenor":172000},{"color":"GRIS PITON","talle":"T2","stock":null,"priceMayor":74782,"priceMenor":172000},{"color":"GRIS PITON","talle":"T3","stock":null,"priceMayor":74782,"priceMenor":172000}],"stockSource":null},{"id":"pantalon-antika","name":"PANTALON ANTIKA","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON OXFORD BENGALINA","priceMayor":41304,"priceMenor":95000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":41304,"priceMenor":95000}],"stockSource":null},{"id":"pantalon-waikiki","name":"PANTALON WAIKIKI","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON ARRUGADO BABUCHA","priceMayor":47826,"priceMenor":110000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":47826,"priceMenor":110000}],"stockSource":null},{"id":"pantalon-waimea","name":"PANTALON WAIMEA","collection":"VERANO 2027","category":"PANTALONES","description":"BABUCHA SATEN","priceMayor":63043,"priceMenor":145000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":63043,"priceMenor":145000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":63043,"priceMenor":145000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":63043,"priceMenor":145000},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":63043,"priceMenor":145000},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":63043,"priceMenor":145000},{"color":"CHOCOLATE","talle":"T3","stock":null,"priceMayor":63043,"priceMenor":145000}],"stockSource":null},{"id":"pant-babucha-lino","name":"PANT BABUCHA LINO","collection":"VERANO 2027","category":"PANTALONES","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"VISON","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-paros","name":"PANTALON PAROS","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON PALAZZO TABLA","priceMayor":58696,"priceMenor":135000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":58696,"priceMenor":135000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":58696,"priceMenor":135000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":58696,"priceMenor":135000},{"color":"VISON","talle":"T1","stock":null,"priceMayor":58696,"priceMenor":135000},{"color":"VISON","talle":"T2","stock":null,"priceMayor":58696,"priceMenor":135000},{"color":"VISON","talle":"T3","stock":null,"priceMayor":58696,"priceMenor":135000}],"stockSource":null},{"id":"pantalon-paradise","name":"PANTALON PARADISE","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON PORTOFINO","priceMayor":67391,"priceMenor":155000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"BEIGE","talle":"T1","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"BEIGE","talle":"T2","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"BEIGE","talle":"T3","stock":null,"priceMayor":67391,"priceMenor":155000}],"stockSource":null},{"id":"pantalon-pelicanos","name":"PANTALON PELICANOS","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON BAGGIE GABARDINA","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"VISON","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-formentera","name":"PANTALON FORMENTERA","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON NEO CREPE","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-lisboa","name":"PANTALON LISBOA","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON ZIG ZAG","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-ibiza","name":"PANTALON IBIZA","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON PRINTED","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"ESTAMPA NEGRA","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ESTAMPA NEGRA","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ESTAMPA NEGRA","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-ipanema","name":"PANTALON IPANEMA","collection":"VERANO 2027","category":"PANTALONES","description":"PALAZZO SILK","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"GRIS GRAFITO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-ischia","name":"PANTALON ISCHIA","collection":"VERANO 2027","category":"PANTALONES","description":"CONTRAST PANT","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-mancora","name":"PANTALON MANCORA","collection":"VERANO 2027","category":"PANTALONES","description":"PALAZZO SATEN","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-milos","name":"PANTALON MILOS","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON CON ENTREDOS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-noosa","name":"PANTALON NOOSA","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON DOBLE","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"GRIS CLARO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS CLARO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-natal","name":"PANTALON NATAL","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON BRENDEN","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"ROJO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ROJO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ROJO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-pylos","name":"PANTALON PYLOS","collection":"VERANO 2027","category":"PANTALONES","description":"PANTALON BRENDEN","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"VERDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"remera-jurere","name":"REMERA JURERE","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA AMERICANA ENCAJE","priceMayor":33913,"priceMenor":78000,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":33913,"priceMenor":78000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":33913,"priceMenor":78000},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":33913,"priceMenor":78000}],"stockSource":null},{"id":"remera-lentejuelas","name":"REMERA LENTEJUELAS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"","priceMayor":47826,"priceMenor":110000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":47826,"priceMenor":110000}],"stockSource":null},{"id":"remera-positano","name":"REMERA POSITANO","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA ENCAJE MANGA 3/4","priceMayor":26087,"priceMenor":60000,"image":null,"variants":[{"color":"BEIGE","talle":"TU","stock":null,"priceMayor":26087,"priceMenor":60000},{"color":"GRIS GRAFITO","talle":"TU","stock":null,"priceMayor":26087,"priceMenor":60000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":26087,"priceMenor":60000}],"stockSource":null},{"id":"remera-pipeline","name":"REMERA PIPELINE","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"FLAME CON TACHAS","priceMayor":32609,"priceMenor":75000,"image":null,"variants":[{"color":"BEIGE","talle":"TU","stock":null,"priceMayor":32609,"priceMenor":75000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":32609,"priceMenor":75000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":32609,"priceMenor":75000}],"stockSource":null},{"id":"remera-paracas","name":"REMERA PARACAS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA ENCAJE SIN MANGAS","priceMayor":23913,"priceMenor":55000,"image":null,"variants":[{"color":"GRIS GRAFITO","talle":"TU","stock":null,"priceMayor":23913,"priceMenor":55000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":23913,"priceMenor":55000},{"color":"BLANCO","talle":"TU","stock":null,"priceMayor":23913,"priceMenor":55000}],"stockSource":null},{"id":"remera-pocitos","name":"REMERA POCITOS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA PUNTILLA RUEDO","priceMayor":29130,"priceMenor":67000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":29130,"priceMenor":67000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":29130,"priceMenor":67000}],"stockSource":null},{"id":"remera-pavones","name":"REMERA PAVONES","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA BOTE MERLOT","priceMayor":23913,"priceMenor":55000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":23913,"priceMenor":55000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":23913,"priceMenor":55000}],"stockSource":null},{"id":"remera-portillo","name":"REMERA PORTILLO","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA IRREGULAR FLAME","priceMayor":30435,"priceMenor":70000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":30435,"priceMenor":70000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":30435,"priceMenor":70000},{"color":"BEIGE","talle":"TU","stock":null,"priceMayor":30435,"priceMenor":70000}],"stockSource":null},{"id":"remera-pompano","name":"REMERA POMPANO","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA AMERICANA CON PUNTILLA","priceMayor":26087,"priceMenor":60000,"image":null,"variants":[{"color":"BLANCA","talle":"TU","stock":null,"priceMayor":26087,"priceMenor":60000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":26087,"priceMenor":60000},{"color":"ROSA","talle":"TU","stock":null,"priceMayor":26087,"priceMenor":60000}],"stockSource":null},{"id":"remera-mangas-ballon","name":"REMERA MANGAS BALLON","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"COLOR2","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"COLOR2","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"remera-solanas","name":"REMERA SOLANAS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"MUSCULOSA BUCHE","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"BLANCO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS MELANGE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"remera-samara","name":"REMERA SAMARA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"MUSCULOSA MORLEY ESCOTE V","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"BLANCO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"remera-siesta","name":"REMERA SIESTA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"REMERA FLUFLY VIC","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS MELANGE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"remera-sugar","name":"REMERA SUGAR","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP ELASTIQUITOS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"BLANCO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"BLANCO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NUDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NUDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"remera-piton","name":"REMERA PITON","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CAMEL","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ACERO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-antika","name":"TOP ANTIKA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP PEPLUN","priceMayor":32609,"priceMenor":75000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":32609,"priceMenor":75000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":32609,"priceMenor":75000}],"stockSource":null},{"id":"top-lagoas","name":"TOP LAGOAS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP ZADIG PUNTILLA","priceMayor":56522,"priceMenor":130000,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":56522,"priceMenor":130000},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":56522,"priceMenor":130000},{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":56522,"priceMenor":130000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":56522,"priceMenor":130000},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":56522,"priceMenor":130000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":56522,"priceMenor":130000}],"stockSource":null},{"id":"top-miami","name":"TOP MIAMI","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP LENTEJUELAS","priceMayor":37826,"priceMenor":87000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":37826,"priceMenor":87000},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":37826,"priceMenor":87000}],"stockSource":null},{"id":"top-waikiki","name":"TOP WAIKIKI","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP WAIKIKI","priceMayor":34783,"priceMenor":80000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":34783,"priceMenor":80000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":34783,"priceMenor":80000},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":34783,"priceMenor":80000},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":34783,"priceMenor":80000}],"stockSource":null},{"id":"top-waimea","name":"TOP WAIMEA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP CRETA","priceMayor":47826,"priceMenor":110000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":47826,"priceMenor":110000},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":47826,"priceMenor":110000}],"stockSource":null},{"id":"top-paradise","name":"TOP PARADISE","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP PORTOFINO","priceMayor":41304,"priceMenor":95000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":41304,"priceMenor":95000}],"stockSource":null},{"id":"top-campeche","name":"TOP CAMPECHE","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"NUBE","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-ipanema","name":"TOP IPANEMA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP SILK","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"GRIS GRAFITO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-ixtapa","name":"TOP IXTAPA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP PLISADO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"GRIS GRAFITO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-mancora","name":"TOP MANCORA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP FLECOS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-milos","name":"TOP MILOS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP ENTREDOS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-macarella","name":"TOP MACARELLA","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP CORDON CHER","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-napoles","name":"TOP NAPOLES","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP BUCHE LINO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ROJO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"ROJO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-pylos","name":"TOP PYLOS","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"TOP BUCHE","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"VERDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"top-lurex-cruzado","name":"TOP LUREX CRUZADO","collection":"VERANO 2027","category":"REMERAS Y TOPS","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"LUREX","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"pantalon-lurex","name":"PANTALON LUREX","collection":"VERANO 2027","category":"PANTALONES","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"LUREX","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"LUREX","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-jarvis","name":"VESTIDO JARVIS","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO ENCAJE V","priceMayor":84782,"priceMenor":195000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":84782,"priceMenor":195000},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":84782,"priceMenor":195000}],"stockSource":null},{"id":"vestido-annete","name":"VESTIDO ANNETE","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO BRETEL ENCAJE","priceMayor":91304,"priceMenor":210000,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":91304,"priceMenor":210000},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":91304,"priceMenor":210000},{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":91304,"priceMenor":210000},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":91304,"priceMenor":210000}],"stockSource":null},{"id":"vestido-lagoas","name":"VESTIDO LAGOAS","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO ZADIG PUNTILLA","priceMayor":104348,"priceMenor":240000,"image":null,"variants":[{"color":"CHOCOLATE","talle":"T1","stock":null,"priceMayor":104348,"priceMenor":240000},{"color":"CHOCOLATE","talle":"T2","stock":null,"priceMayor":104348,"priceMenor":240000},{"color":"VERDE","talle":"T1","stock":null,"priceMayor":104348,"priceMenor":240000},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":104348,"priceMenor":240000}],"stockSource":null},{"id":"vestido-lido","name":"VESTIDO LIDO","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO LINO VOLADO","priceMayor":67391,"priceMenor":155000,"image":null,"variants":[{"color":"BEIGE","talle":"T1","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"BEIGE","talle":"T2","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"ROJO","talle":"T1","stock":null,"priceMayor":67391,"priceMenor":155000},{"color":"ROJO","talle":"T2","stock":null,"priceMayor":67391,"priceMenor":155000}],"stockSource":null},{"id":"vestido-campeche","name":"VESTIDO CAMPECHE","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO RAJESH","priceMayor":113043,"priceMenor":260000,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":113043,"priceMenor":260000},{"color":"A DEFINIR","talle":"TU","stock":null,"priceMayor":113043,"priceMenor":260000}],"stockSource":null},{"id":"vestido-zara-puntilla","name":"VESTIDO ZARA PUNTILLA","collection":"VERANO 2027","category":"VESTIDOS","description":"","priceMayor":134783,"priceMenor":310000,"image":null,"variants":[{"color":"NUDE","talle":"TU","stock":null,"priceMayor":134783,"priceMenor":310000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":134783,"priceMenor":310000},{"color":"ROJO","talle":"TU","stock":null,"priceMayor":134783,"priceMenor":310000}],"stockSource":null},{"id":"vestido-lentejuelas","name":"VESTIDO LENTEJUELAS","collection":"VERANO 2027","category":"VESTIDOS","description":"","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-pipa","name":"VESTIDO PIPA","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO ENCAJE","priceMayor":39130,"priceMenor":90000,"image":null,"variants":[{"color":"BEIGE","talle":"TU","stock":null,"priceMayor":39130,"priceMenor":90000},{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":39130,"priceMenor":90000}],"stockSource":null},{"id":"vestido-porto","name":"VESTIDO PORTO","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO NEGRO C ZIGZAG","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-lisboa","name":"VESTIDO LISBOA","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO ZIG ZAG","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CHOCOLATE","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-ipanema","name":"VESTIDO IPANEMA","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO SILK LARGO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VERDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-ixtapa","name":"VESTIDO IXTAPA","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO PLISADO","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"GRIS GRAFITO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"VISON","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null},{"color":"CRUDO","talle":"TU","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-mancora","name":"VESTIDO MANCORA","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO FLECOS","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NUDE","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NUDE","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NUDE","talle":"T3","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null},{"id":"vestido-mondrago","name":"VESTIDO MONDRAGO","collection":"VERANO 2027","category":"VESTIDOS","description":"VESTIDO LARGO LUREX","priceMayor":null,"priceMenor":null,"image":null,"variants":[{"color":"NEGRO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"NEGRO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null},{"color":"BLANCO","talle":"T1","stock":null,"priceMayor":null,"priceMenor":null},{"color":"BLANCO","talle":"T2","stock":null,"priceMayor":null,"priceMenor":null}],"stockSource":null}];
+const ACCESS_CODE = "ANONIMAS2026";
+const WHATSAPP_NUMBER = "5491130224802";
+const TALLE_ORDER = {T1:1,T2:2,T3:3,T4:4,TU:5};
+
+/* ============================================================
+   STATE (persisted in localStorage)
+   ============================================================ */
+/* ============================================================
+   STORAGE — defensive wrapper. Some contexts (sandboxed previews,
+   private browsing, file:// in some browsers) throw on localStorage
+   access; falling back to an in-memory store keeps the site working
+   (just without persistence) instead of silently breaking all the
+   script that runs after it.
+   ============================================================ */
+const memoryStore = {};
+function storageGet(key){
+  try { return localStorage.getItem(key); } catch(e){ return (key in memoryStore) ? memoryStore[key] : null; }
+}
+function storageSet(key, val){
+  try { localStorage.setItem(key, val); } catch(e){ memoryStore[key] = val; }
+}
+
+let order = JSON.parse(storageGet('anonimas_order') || '[]');
+let activeCollection = 'ALL';
+let activeCategory = '';
+let searchTerm = '';
+
+function saveOrder(){ storageSet('anonimas_order', JSON.stringify(order)); renderTray(); }
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function money(n){
+  if(n === null || n === undefined) return null;
+  return '$' + n.toLocaleString('es-AR');
+}
+function initials(name){
+  return name.split(' ').slice(0,2).map(w=>w[0]).join('');
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function placeholderBlock(name, big){
+  return `<div class="mono">${initials(name)}<span>${big?'FOTO PRÓXIMAMENTE':'S/ FOTO'}</span></div>`;
+}
+
+/* ============================================================
+   ACCESS GATE
+   ============================================================ */
+const gate = document.getElementById('gate');
+if(storageGet('anonimas_access') === 'granted'){ gate.hidden = true; }
+document.getElementById('gateForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const val = document.getElementById('gateInput').value.trim().toUpperCase();
+  if(val === ACCESS_CODE){
+    storageSet('anonimas_access','granted');
+    gate.hidden = true;
+  } else {
+    document.getElementById('gateError').textContent = 'Código incorrecto. Probá de nuevo.';
+  }
+});
+
+/* ============================================================
+   FILTER BAR SETUP
+   ============================================================ */
+const collections = ['ALL', ...new Set(PRODUCTS.map(p=>p.collection))];
+const collectionLabels = {ALL:'Todo', 'INVIERNO 26':'Invierno 26', 'VERANO 2027':'Verano 2027'};
+const tabsEl = document.getElementById('collectionTabs');
+collections.forEach(c=>{
+  const b = document.createElement('button');
+  b.className = 'tab' + (c==='ALL' ? ' active':'');
+  b.textContent = collectionLabels[c] || c;
+  b.dataset.value = c;
+  b.addEventListener('click', ()=>{
+    activeCollection = c;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    b.classList.add('active');
+    render();
+  });
+  tabsEl.appendChild(b);
+});
+
+const categories = [...new Set(PRODUCTS.map(p=>p.category))].sort();
+const catSelect = document.getElementById('categoryFilter');
+categories.forEach(c=>{
+  const o = document.createElement('option');
+  o.value = c; o.textContent = c;
+  catSelect.appendChild(o);
+});
+catSelect.addEventListener('change', ()=>{ activeCategory = catSelect.value; render(); });
+document.getElementById('searchInput').addEventListener('input', (e)=>{
+  searchTerm = e.target.value.trim().toLowerCase();
+  render();
+});
+
+/* ============================================================
+   GRID RENDER
+   ============================================================ */
+function filteredProducts(){
+  return PRODUCTS.filter(p=>{
+    if(activeCollection !== 'ALL' && p.collection !== activeCollection) return false;
+    if(activeCategory && p.category !== activeCategory) return false;
+    if(searchTerm && !p.name.toLowerCase().includes(searchTerm)) return false;
+    return true;
+  });
+}
+function productTotalStock(p){
+  if(p.collection !== 'INVIERNO 26') return null; // unknown stock -> no badge
+  return p.variants.reduce((s,v)=> s + (v.stock||0), 0);
+}
+function render(){
+  const list = filteredProducts();
+  document.getElementById('resultCount').textContent = list.length + ' producto' + (list.length===1?'':'s');
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if(list.length === 0){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h3>No encontramos productos</h3><p>Probá con otro filtro o búsqueda.</p></div>';
+    return;
+  }
+  list.forEach(p=>{
+    const card = document.createElement('button');
+    card.className = 'card';
+    const stock = productTotalStock(p);
+    const priceHtml = p.priceMayor
+      ? `<div class="card-price">${money(p.priceMayor)}</div>`
+      : `<div class="card-price consult">Consultar precio</div>`;
+    card.innerHTML = `
+      <div class="card-img">
+        <span class="tag-collection">${collectionLabels[p.collection]||p.collection}</span>
+        ${stock === 0 ? '<span class="tag-nostock">Sin stock</span>' : ''}
+        ${placeholderBlock(p.name)}
+      </div>
+      <div class="card-body">
+        <div class="card-cat">${p.category}</div>
+        <div class="card-name">${p.name}</div>
+        ${priceHtml}
+      </div>`;
+    card.addEventListener('click', ()=> openProduct(p.id));
+    grid.appendChild(card);
+  });
+}
+
+/* ============================================================
+   PRODUCT MODAL
+   ============================================================ */
+let currentProduct = null;
+let currentColor = null;
+let currentTalle = null;
+let currentQty = 1;
+
+function variantsForColor(p, color){
+  return p.variants.filter(v=>v.color === color);
+}
+function availableColors(p){
+  return [...new Set(p.variants.map(v=>v.color).filter(Boolean))];
+}
+function availableTalles(p, color){
+  const t = p.variants.filter(v=>v.color===color).map(v=>v.talle).filter(Boolean);
+  return [...new Set(t)].sort((a,b)=>(TALLE_ORDER[a]||9)-(TALLE_ORDER[b]||9));
+}
+function variantStock(p, color, talle){
+  const v = p.variants.find(v=>v.color===color && v.talle===talle);
+  return v ? v.stock : null;
+}
+function variantPrice(p, color, talle){
+  const v = p.variants.find(v=>v.color===color && v.talle===talle);
+  if(v && v.priceMayor) return v.priceMayor;
+  return p.priceMayor;
+}
+
+function openProduct(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  currentProduct = p;
+  currentColor = availableColors(p)[0] || null;
+  const talles = availableTalles(p, currentColor);
+  currentTalle = talles[0] || null;
+  currentQty = 1;
+  renderModal();
+  document.getElementById('productModal').hidden = false;
+}
+function renderModal(){
+  const p = currentProduct;
+  const colors = availableColors(p);
+  const talles = availableTalles(p, currentColor);
+  const stock = currentTalle ? variantStock(p, currentColor, currentTalle) : null;
+  const price = variantPrice(p, currentColor, currentTalle);
+  const showMenor = p.priceMenor && price === p.priceMayor;
+
+  let stockHtml = '';
+  if(stock === 0) stockHtml = '<div class="stock-hint out">Sin stock disponible en este color/talle.</div>';
+  else if(stock !== null && stock <= 2) stockHtml = `<div class="stock-hint low">¡Últimas unidades! (${stock})</div>`;
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-img">${placeholderBlock(p.name, true)}</div>
+    <div class="modal-body">
+      <div class="modal-cat">${p.category} · ${collectionLabels[p.collection]||p.collection}</div>
+      <h3 class="modal-name">${p.name}</h3>
+      ${price ? `<div class="modal-price">${money(price)}</div>` : `<div class="modal-price consult">Consultar precio</div>`}
+      ${showMenor ? `<div class="modal-price-menor">PVP sugerido: ${money(p.priceMenor)}</div>` : ''}
+      ${p.description ? `<p class="modal-desc">${p.description}</p>` : ''}
+
+      ${colors.length ? `
+      <div class="field-label">Color</div>
+      <div class="swatches" id="colorSwatches">
+        ${colors.map(c=>`<button class="swatch ${c===currentColor?'active':''}" data-color="${c}">${c}</button>`).join('')}
+      </div>` : ''}
+
+      ${talles.length ? `
+      <div class="field-label">Talle</div>
+      <div class="swatches" id="talleSwatches">
+        ${talles.map(t=>{
+          const st = variantStock(p, currentColor, t);
+          const disabled = st === 0;
+          return `<button class="swatch ${t===currentTalle?'active':''}" data-talle="${t}" ${disabled?'disabled':''}>${t}</button>`;
+        }).join('')}
+      </div>` : ''}
+
+      ${stockHtml}
+
+      <div class="qty-row">
+        <div class="field-label" style="margin:0;">Cantidad</div>
+        <div class="stepper">
+          <button id="qtyMinus">−</button>
+          <span id="qtyVal">${currentQty}</span>
+          <button id="qtyPlus">+</button>
+        </div>
+      </div>
+
+      <button class="modal-add" id="addToOrderBtn" ${stock===0?'disabled':''}>
+        ${stock===0 ? 'Sin stock' : 'Agregar a mi pedido'}
+      </button>
+      <a class="talle-guide-link" href="https://mayoristas.anonimasargentina.com/productos/${p.id}/" target="_blank">Ver ficha completa en la tienda →</a>
+    </div>
+  `;
+
+  document.querySelectorAll('#colorSwatches .swatch').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      currentColor = b.dataset.color;
+      const t = availableTalles(p, currentColor);
+      currentTalle = t[0] || null;
+      currentQty = 1;
+      renderModal();
+    });
+  });
+  document.querySelectorAll('#talleSwatches .swatch').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(b.disabled) return;
+      currentTalle = b.dataset.talle;
+      renderModal();
+    });
+  });
+  const qtyValEl = document.getElementById('qtyVal');
+  document.getElementById('qtyMinus').addEventListener('click', ()=>{
+    if(currentQty>1){ currentQty--; qtyValEl.textContent = currentQty; }
+  });
+  document.getElementById('qtyPlus').addEventListener('click', ()=>{
+    currentQty++; qtyValEl.textContent = currentQty;
+  });
+  const addBtn = document.getElementById('addToOrderBtn');
+  if(addBtn) addBtn.addEventListener('click', addCurrentToOrder);
+}
+
+function addCurrentToOrder(){
+  const p = currentProduct;
+  const price = variantPrice(p, currentColor, currentTalle);
+  const key = [p.id, currentColor, currentTalle].join('|');
+  const existing = order.find(o=>o.key===key);
+  if(existing){
+    existing.qty += currentQty;
+  } else {
+    order.push({
+      key, productId:p.id, name:p.name, color:currentColor, talle:currentTalle,
+      qty:currentQty, price: price, collection:p.collection
+    });
+  }
+  saveOrder();
+  showToast(`Agregado: ${p.name}${currentColor?' · '+currentColor:''}${currentTalle?' · '+currentTalle:''}`);
+  document.getElementById('productModal').hidden = true;
+}
+
+document.getElementById('closeModal').addEventListener('click', ()=>{
+  document.getElementById('productModal').hidden = true;
+});
+document.getElementById('productModal').addEventListener('click', (e)=>{
+  if(e.target.id === 'productModal') document.getElementById('productModal').hidden = true;
+});
+
+/* ============================================================
+   ORDER TRAY
+   ============================================================ */
+function orderTotals(){
+  let units = 0, total = 0, unpriced = 0;
+  order.forEach(o=>{
+    units += o.qty;
+    if(o.price){ total += o.price * o.qty; } else { unpriced += o.qty; }
+  });
+  return {units, total, unpriced};
+}
+function renderTray(){
+  const {units, total, unpriced} = orderTotals();
+  const trayBar = document.getElementById('trayBar');
+  const badge = document.getElementById('trayBadge');
+  if(units === 0){
+    trayBar.hidden = true;
+    badge.hidden = true;
+  } else {
+    trayBar.hidden = false;
+    badge.hidden = false;
+    badge.textContent = units;
+    document.getElementById('trayBarCount').textContent = units + ' producto' + (units===1?'':'s');
+    document.getElementById('trayBarTotal').textContent = 'Total estimado ' + money(total) + (unpriced?` (+${unpriced} a consultar)`:'');
+  }
+
+  const itemsEl = document.getElementById('trayItems');
+  if(order.length === 0){
+    itemsEl.innerHTML = '<div class="tray-empty">Todavía no agregaste productos.<br>Explorá el catálogo y armá tu pedido.</div>';
+  } else {
+    itemsEl.innerHTML = order.map(o=>`
+      <div class="tray-item">
+        <div class="tray-item-thumb">${initials(o.name)}</div>
+        <div class="tray-item-info">
+          <b>${o.name}</b>
+          <span>${[o.color,o.talle].filter(Boolean).join(' · ') || 'Talle único'}</span>
+          <span>${o.price ? money(o.price)+' c/u' : 'Consultar precio'}</span>
+        </div>
+        <div class="tray-item-right">
+          <div class="tray-item-price">${o.price ? money(o.price*o.qty) : '—'}</div>
+          <div class="tray-item-actions">
+            <button data-act="minus" data-key="${o.key}">−</button>
+            <span>${o.qty}</span>
+            <button data-act="plus" data-key="${o.key}">+</button>
+          </div>
+          <button class="tray-item-remove" data-act="remove" data-key="${o.key}">Quitar</button>
+        </div>
+      </div>
+    `).join('');
+    itemsEl.querySelectorAll('button[data-act]').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const key = b.dataset.key;
+        const item = order.find(o=>o.key===key);
+        if(!item) return;
+        if(b.dataset.act === 'plus') item.qty++;
+        if(b.dataset.act === 'minus'){ item.qty--; if(item.qty<=0){ order = order.filter(o=>o.key!==key); } }
+        if(b.dataset.act === 'remove'){ order = order.filter(o=>o.key!==key); }
+        saveOrder();
+      });
+    });
+  }
+
+  const footerEl = document.getElementById('trayFooter');
+  if(order.length === 0){
+    footerEl.innerHTML = '';
+  } else {
+    footerEl.innerHTML = `
+      <input type="text" class="client-field" id="clientName" placeholder="Tu nombre o el de tu local (opcional)" value="${storageGet('anonimas_client')||''}">
+      <div class="tray-total-row"><span>Unidades</span><span>${units}</span></div>
+      ${unpriced ? `<div class="tray-total-row"><span>A consultar</span><span>${unpriced} unid.</span></div>` : ''}
+      <div class="tray-total-row main"><span>Total estimado</span><span>${money(total)}</span></div>
+      <button class="btn-whatsapp" id="sendWhatsapp">📲 Enviar pedido por WhatsApp</button>
+      <button class="tray-clear" id="clearOrder">Vaciar pedido</button>
+    `;
+    document.getElementById('clientName').addEventListener('input', (e)=>{
+      storageSet('anonimas_client', e.target.value);
+    });
+    document.getElementById('sendWhatsapp').addEventListener('click', sendOrderViaWhatsapp);
+    document.getElementById('clearOrder').addEventListener('click', ()=>{
+      if(confirm('¿Vaciar todo el pedido?')){ order = []; saveOrder(); }
+    });
+  }
+}
+
+function sendOrderViaWhatsapp(){
+  const {total, unpriced} = orderTotals();
+  const client = (document.getElementById('clientName').value || '').trim();
+  let lines = [];
+  lines.push('PEDIDO MAYORISTA - ANONIMAS');
+  if(client) lines.push('Cliente: ' + client);
+  lines.push('');
+  const byCollection = {};
+  order.forEach(o=>{
+    byCollection[o.collection] = byCollection[o.collection] || [];
+    byCollection[o.collection].push(o);
+  });
+  Object.keys(byCollection).forEach(col=>{
+    lines.push('— ' + (collectionLabels[col]||col).toUpperCase() + ' —');
+    byCollection[col].forEach(o=>{
+      const desc = [o.color, o.talle].filter(Boolean).join(' / ') || 'Talle único';
+      const priceTxt = o.price ? money(o.price) + ' c/u' : 'a consultar';
+      lines.push(`• ${o.name} (${desc}) x${o.qty} — ${priceTxt}`);
+    });
+    lines.push('');
+  });
+  lines.push(`Total estimado: ${money(total)}` + (unpriced ? ` (+${unpriced} unid. a consultar)` : ''));
+  lines.push('');
+  lines.push('Envío este pedido para coordinar pago y envío.');
+
+  const text = encodeURIComponent(lines.join('\n'));
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+}
+
+document.getElementById('openTrayBtn').addEventListener('click', ()=> document.getElementById('trayPanel').hidden = false);
+document.getElementById('trayOpenBtn2').addEventListener('click', ()=> document.getElementById('trayPanel').hidden = false);
+document.getElementById('closeTray').addEventListener('click', ()=> document.getElementById('trayPanel').hidden = true);
+document.getElementById('trayPanel').addEventListener('click', (e)=>{
+  if(e.target.id === 'trayPanel') document.getElementById('trayPanel').hidden = true;
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+render();
+renderTray();
+</script>
+</body>
+</html>
